@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
       - name: flask-api
-        image: muyiwao/flask-api:latest
+        image: guillou73/flask-api:latest
         ports:
         - containerPort: 5310
         env:
