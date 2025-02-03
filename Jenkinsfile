@@ -2,7 +2,7 @@ pipeline {
     agent any
     environment {
         VENV_DIR = 'venv'
-        DOCKER_IMAGE = 'GUILLOU73/flask-api:latest'
+        DOCKER_IMAGE = 'guillou73/flask-api:latest'
         FLASK_APP_PORT = '5310'
         SERVER_IP = '18.132.73.146' // Replace with your server's public IP
     }
