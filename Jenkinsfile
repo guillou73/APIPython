@@ -2,14 +2,14 @@ pipeline {
     agent any
     environment {
         VENV_DIR = 'venv'
-        DOCKER_IMAGE = 'muyiwao/flask-api:latest'
+        DOCKER_IMAGE = 'GUILLOU73/flask-api:latest'
         FLASK_APP_PORT = '5310'
         SERVER_IP = '18.132.73.146' // Replace with your server's public IP
     }
     stages {
         stage('Clone Repository') {
             steps {
-                git url: 'https://github.com/muyiwao/APIPython.git', branch: 'main'
+                git url: 'https://github.com/guillou73/APIPython.git', branch: 'main'
             }
         }
         stage('Set Up Virtual Environment') {
@@ -54,7 +54,7 @@ pipeline {
             steps {
                 script {
                     // Log in to Docker Hub
-                    withCredentials([usernamePassword(credentialsId: 'muyiwa-hub', usernameVariable: 'DOCKER_HUB_USERNAME', passwordVariable: 'DOCKER_HUB_PASSWORD')]) {
+                    withCredentials([usernamePassword(credentialsId: 'guillou73', usernameVariable: 'DOCKER_HUB_USERNAME', passwordVariable: 'DOCKER_HUB_PASSWORD')]) {
                         sh 'echo ${DOCKER_HUB_PASSWORD} | docker login -u ${DOCKER_HUB_USERNAME} --password-stdin'
                     }
                     // Push the image
