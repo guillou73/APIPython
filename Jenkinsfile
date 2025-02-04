@@ -62,32 +62,25 @@ pipeline {
                 }
             }
         }
-        stage('Verify Deployment Files') {
-            steps {
-                script {
-                    // Verify that the deployment files exist
-                    sh 'ls -al k8s/'
-                }
-            }
-        }
-        stage('Deploy to Kubernetes') {
-            steps {
-                script {
-                    // Apply the Kubernetes deployment and service files
-                    sh '''
-                    kubectl apply -f k8s/deployment.yaml
-                    kubectl apply -f k8s/service.yaml
-                    '''
-                }
-            }
-        }
     }
     post {
         success {
             // Output the full URL to access the Flask API
             echo "Build succeeded. The Flask API is running at http://${SERVER_IP}:${FLASK_APP_PORT}/data"
+            // Send success email notification
+            emailext subject: "Jenkins Build SUCCESS: ${env.JOB_NAME} #${env.BUILD_NUMBER}", 
+                     body: "The build was successful. View details at ${env.BUILD_URL}", 
+                     recipientProviders: [[$class: 'DevelopersRecipientProvider']]
+        }
+        failure {
+            // Send failure email notification
+            emailext subject: "Jenkins Build FAILURE: ${env.JOB_NAME} #${env.BUILD_NUMBER}", 
+                     body: "The build has failed. View details at ${env.BUILD_URL}", 
+                     recipientProviders: [[$class: 'DevelopersRecipientProvider']]
+            // Additional failure alert
+            mail to: 'guyseutcheu@gmail.com', 
+                 subject: "Jenkins Build FAILURE: ${env.JOB_NAME} #${env.BUILD_NUMBER}", 
+                 body: "The build has failed. Please check the Jenkins logs for details: ${env.BUILD_URL}"
         }
     }
 }
-
-
