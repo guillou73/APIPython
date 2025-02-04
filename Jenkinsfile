@@ -78,7 +78,7 @@ pipeline {
                      body: "The build has failed. View details at ${env.BUILD_URL}", 
                      recipientProviders: [[$class: 'DevelopersRecipientProvider']]
             // Additional failure alert
-            mail to: 'admin@example.com', 
+            mail to: 'guyseutcheu@gmail.com', 
                  subject: "Jenkins Build FAILURE: ${env.JOB_NAME} #${env.BUILD_NUMBER}", 
                  body: "The build has failed. Please check the Jenkins logs for details: ${env.BUILD_URL}"
         }
