@@ -4,7 +4,7 @@ pipeline {
         VENV_DIR = 'venv'
         DOCKER_IMAGE = 'guillou73/flask-api:latest'
         FLASK_APP_PORT = '5310'
-        SERVER_IP = '18.132.73.146' // Replace with your server's public IP
+        SERVER_IP = '18.132.73.146' // Replace with your server's public IPs
     }
     stages {
         stage('Clone Repository') {
@@ -54,7 +54,7 @@ pipeline {
             steps {
                 script {
                     // Log in to Docker Hub
-                    withCredentials([usernamePassword(credentialsId: 'guillou73', usernameVariable: 'DOCKER_HUB_USERNAME', passwordVariable: 'DOCKER_HUB_PASSWORD')]) {
+                    withCredentials([usernamePassword(credentialsId: 'docker-hub', usernameVariable: 'DOCKER_HUB_USERNAME', passwordVariable: 'DOCKER_HUB_PASSWORD')]) {
                         sh 'echo ${DOCKER_HUB_PASSWORD} | docker login -u ${DOCKER_HUB_USERNAME} --password-stdin'
                     }
                     // Push the image
@@ -62,32 +62,23 @@ pipeline {
                 }
             }
         }
-        stage('Verify Deployment Files') {
-            steps {
-                script {
-                    // Verify that the deployment files exist
-                    sh 'ls -al k8s/'
-                }
-            }
-        }
-        stage('Deploy to Kubernetes') {
-            steps {
-                script {
-                    // Apply the Kubernetes deployment and service files
-                    sh '''
-                    kubectl apply -f k8s/deployment.yaml
-                    kubectl apply -f k8s/service.yaml
-                    '''
-                }
-            }
-        }
     }
     post {
         success {
-            // Output the full URL to access the Flask API
             echo "Build succeeded. The Flask API is running at http://${SERVER_IP}:${FLASK_APP_PORT}/data"
+
+            emailext subject: "Jenkins Build SUCCESS: ${env.JOB_NAME} #${env.BUILD_NUMBER}", 
+                     body: "The build was successful. View details at ${env.BUILD_URL}", 
+                     recipientProviders: [[$class: 'DevelopersRecipientProvider']]
+        }
+        failure {
+            emailext subject: "Jenkins Build FAILURE: ${env.JOB_NAME} #${env.BUILD_NUMBER}", 
+                     body: "The build has failed. View details at ${env.BUILD_URL}", 
+                     recipientProviders: [[$class: 'DevelopersRecipientProvider']]
+
+            mail to: 'guyseutcheu@gmail.com', 
+                 subject: "Jenkins Build FAILURE: ${env.JOB_NAME} #${env.BUILD_NUMBER}", 
+                 body: "The build has failed. Please check the Jenkins logs for details: ${env.BUILD_URL}"
         }
     }
 }
-
-
